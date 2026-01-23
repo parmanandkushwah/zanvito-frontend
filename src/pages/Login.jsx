@@ -5,15 +5,16 @@ import { Apple, Play } from "lucide-react";
 
 function Login() {
   const [phone, setPhone] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const API_URL = process.env.REACT_APP_API_URL;
   console.log("API URL:", API_URL);
 
  const handleContinue = async () => {
-  if (phone.length !== 10) return;
+  if (phone.length !== 10 || loading) return;
 
   try {
-
+    setLoading(true);
 
     const res = await fetch(`${API_URL}/api/auth/send-otp`, {
       method: "POST",
@@ -39,12 +40,14 @@ function Login() {
         debug_otp: data.debug_otp,
       },
     });
-
   } catch (err) {
     console.error("Send OTP Error:", err);
     alert("OTP send failed");
+  } finally {
+    setLoading(false);
   }
 };
+
 
   return (
     <div className="min-h-screen bg-[#F3F4F6] flex items-center justify-center px-6">
@@ -232,17 +235,28 @@ function Login() {
 
             {/* BUTTON */}
             <button
-              onClick={handleContinue}
-              disabled={phone.length !== 10}
-              className="
-                mt-6 w-full bg-[#00C389] text-white
-                py-3 rounded-full font-semibold
-                hover:bg-emerald-600 transition
-                disabled:opacity-50
-              "
-            >
-              Continue
-            </button>
+  onClick={handleContinue}
+  disabled={phone.length !== 10 || loading}
+  className="
+    mt-6 w-full bg-[#00C389] text-white
+    py-3 rounded-full font-semibold
+    hover:bg-emerald-600 transition
+    disabled:opacity-50
+    flex items-center justify-center gap-2
+  "
+>
+  {loading && (
+    <span
+      className="
+        h-4 w-4
+        border-2 border-white/40 border-t-white
+        rounded-full animate-spin
+      "
+    />
+  )}
+
+  {loading ? "Continuing..." : "Continue"}
+</button>
 
             <p className="mt-4 text-xs text-center text-[#6B7280]">
               By continuing, you agree to our{" "}
