@@ -120,7 +120,7 @@ const [profilePhoto, setProfilePhoto] = useState(null);
 
             <div className="flex gap-3">
               <a
-                href="#"
+                href=""
                 className="flex items-center gap-3 bg-white/10 hover:bg-white/20
                            border border-white/20 px-4 py-2 rounded-xl transition"
               >
@@ -136,7 +136,7 @@ const [profilePhoto, setProfilePhoto] = useState(null);
               </a>
 
               <a
-                href="#"
+                href=""
                 className="flex items-center gap-3 bg-white/10 hover:bg-white/20
                            border border-white/20 px-4 py-2 rounded-xl transition"
               >

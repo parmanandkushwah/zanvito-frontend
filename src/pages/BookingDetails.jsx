@@ -7,7 +7,6 @@ import {
   Clock,
   MapPin,
   ShieldCheck,
-  User,
   Phone,
   IndianRupee, Star,
 } from "lucide-react";
@@ -64,7 +63,7 @@ function BookingDetails() {
     const [rating, setRating] = useState(0);
 const [review, setReview] = useState("");
 const [submitting, setSubmitting] = useState(false);
-  const { id } = useParams();
+ 
 
   useEffect(() => {
     window.scrollTo(0, 0);
