@@ -112,17 +112,18 @@ const [profilePhoto, setProfilePhoto] = useState(null);
             </ul>
           </div>
 
-          {/* APP DOWNLOAD */}
-          <div className="mt-8 mb-4">
+         {/* APP DOWNLOAD (FIXED) */}
+          <div className="mt-auto">
             <p className="text-sm text-white/70 mb-3">
               Download our app
             </p>
 
             <div className="flex gap-3">
-              <a
-                href=""
-                className="flex items-center gap-3 bg-white/10 hover:bg-white/20
-                           border border-white/20 px-4 py-2 rounded-xl transition"
+              <button
+                type="button"
+                className="flex items-center gap-3 bg-white/10
+                           hover:bg-white/20 border border-white/20
+                           px-4 py-2 rounded-xl transition"
               >
                 <Play size={20} />
                 <div>
@@ -133,12 +134,13 @@ const [profilePhoto, setProfilePhoto] = useState(null);
                     Google Play
                   </p>
                 </div>
-              </a>
+              </button>
 
-              <a
-                href=""
-                className="flex items-center gap-3 bg-white/10 hover:bg-white/20
-                           border border-white/20 px-4 py-2 rounded-xl transition"
+              <button
+                type="button"
+                className="flex items-center gap-3 bg-white/10
+                           hover:bg-white/20 border border-white/20
+                           px-4 py-2 rounded-xl transition"
               >
                 <Apple size={20} />
                 <div>
@@ -149,9 +151,10 @@ const [profilePhoto, setProfilePhoto] = useState(null);
                     App Store
                   </p>
                 </div>
-              </a>
+              </button>
             </div>
           </div>
+        
 
            {/* CLOUD WAVE SVG - Positioned on the right edge */}
           <svg

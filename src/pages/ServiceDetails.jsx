@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import {
   MapPin,
@@ -12,45 +12,52 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { getHomeData } from "../api/homeApi";
 
-
 function ServiceDetails() {
   const { id } = useParams();
 
   const [service, setService] = useState(null);
-const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
 
-useEffect(() => {
-  window.scrollTo(0, 0);
-  fetchService();
-}, [id]);
+  // ✅ FIXED: useCallback to satisfy ESLint
+  const fetchService = useCallback(async () => {
+    try {
+      const res = await getHomeData();
 
-const fetchService = async () => {
-  try {
-    const res = await getHomeData();
+      if (res?.success && Array.isArray(res.services)) {
+        const foundService = res.services.find(
+          (s) => Number(s.id) === Number(id)
+        );
 
-    if (res.success) {
-      const foundService = res.services.find(
-        (s) => Number(s.id) === Number(id)
-      );
-
-      setService(foundService || null);
+        setService(foundService || null);
+      } else {
+        setService(null);
+      }
+    } catch (err) {
+      console.error("Service Detail Error:", err);
+      setService(null);
+    } finally {
+      setLoading(false);
     }
-  } catch (err) {
-    console.error("Service Detail Error:", err);
-  } finally {
-    setLoading(false);
-  }
-};
+  }, [id]);
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    fetchService();
+  }, [fetchService]);
+
+  /* ---------------- LOADING ---------------- */
   if (loading) {
     return (
       <>
         <Navbar />
-        <div className="pt-40 text-center">Loading...</div>
+        <div className="pt-40 text-center text-gray-600">
+          Loading...
+        </div>
       </>
     );
   }
 
+  /* ---------------- NOT FOUND ---------------- */
   if (!service) {
     return (
       <>
@@ -58,6 +65,7 @@ const fetchService = async () => {
         <div className="pt-40 text-center text-gray-500">
           Service not found
         </div>
+        <Footer />
       </>
     );
   }
@@ -69,7 +77,7 @@ const fetchService = async () => {
       <section className="mt-5 pt-28 pb-20 bg-[#F9FAFB]">
         <div className="max-w-6xl mx-auto px-6 grid lg:grid-cols-3 gap-8">
 
-          {/* LEFT CONTENT */}
+          {/* ================= LEFT CONTENT ================= */}
           <div className="lg:col-span-2 space-y-8">
 
             {/* HERO CARD */}
@@ -141,7 +149,7 @@ const fetchService = async () => {
 
           </div>
 
-          {/* BOOKING CARD */}
+          {/* ================= BOOKING CARD ================= */}
           <div className="bg-white rounded-3xl p-6 shadow-lg border border-[#00C389]/30 h-fit sticky top-28">
 
             <h3 className="text-lg font-bold text-[#111827] mb-6">
@@ -150,7 +158,9 @@ const fetchService = async () => {
 
             {/* ADDRESS */}
             <div className="mb-4">
-              <label className="text-sm font-medium">Service Address</label>
+              <label className="text-sm font-medium">
+                Service Address
+              </label>
               <div className="mt-2 flex items-center gap-2 border rounded-xl px-4 py-3">
                 <MapPin size={18} className="text-[#00C389]" />
                 <input
@@ -163,19 +173,29 @@ const fetchService = async () => {
 
             {/* DATE */}
             <div className="mb-4">
-              <label className="text-sm font-medium">Select Date</label>
+              <label className="text-sm font-medium">
+                Select Date
+              </label>
               <div className="mt-2 flex items-center gap-2 border rounded-xl px-4 py-3">
                 <Calendar size={18} className="text-[#00C389]" />
-                <input type="date" className="w-full outline-none text-sm" />
+                <input
+                  type="date"
+                  className="w-full outline-none text-sm"
+                />
               </div>
             </div>
 
             {/* TIME */}
             <div className="mb-6">
-              <label className="text-sm font-medium">Preferred Time</label>
+              <label className="text-sm font-medium">
+                Preferred Time
+              </label>
               <div className="mt-2 flex items-center gap-2 border rounded-xl px-4 py-3">
                 <Clock size={18} className="text-[#00C389]" />
-                <input type="time" className="w-full outline-none text-sm" />
+                <input
+                  type="time"
+                  className="w-full outline-none text-sm"
+                />
               </div>
             </div>
 
@@ -189,13 +209,17 @@ const fetchService = async () => {
 
             {/* CTA */}
             <button
+              type="button"
               className="w-full bg-[#00C389] text-white py-3 rounded-full font-semibold hover:bg-emerald-600 transition"
             >
               Confirm Booking
             </button>
 
             <p className="mt-4 text-xs text-center text-[#6B7280]">
-              <ShieldCheck size={14} className="inline mr-1 text-[#00C389]" />
+              <ShieldCheck
+                size={14}
+                className="inline mr-1 text-[#00C389]"
+              />
               Safe & secure service guaranteed
             </p>
           </div>
