@@ -2,7 +2,6 @@ import React, { useEffect, useState, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-
 import {
   Calendar,
   Clock,
@@ -14,7 +13,7 @@ import {
 } from "lucide-react";
 import { getCustomerBookingDetails } from "../api/bookingApi";
 
-/* 🔥 STATUS CONFIG (same ecosystem) */
+/* 🔥 STATUS CONFIG */
 const statusConfig = {
   SEARCHING_PROVIDER: {
     label: "Searching Provider",
@@ -42,68 +41,23 @@ const statusConfig = {
   },
 };
 
+/* 🔹 SKELETON */
 function BookingDetailsSkeleton() {
   return (
     <div className="space-y-8 animate-pulse">
-      {/* HEADER */}
       <div className="bg-white rounded-3xl p-6 border flex justify-between">
         <div className="space-y-2">
-          <div className="h-5 w-48 bg-gray-200 rounded"></div>
-          <div className="h-4 w-32 bg-gray-200 rounded"></div>
+          <div className="h-5 w-48 bg-gray-200 rounded" />
+          <div className="h-4 w-32 bg-gray-200 rounded" />
         </div>
-        <div className="h-7 w-28 bg-gray-200 rounded-full"></div>
-      </div>
-
-      {/* SERVICE */}
-      <div className="bg-white rounded-3xl p-6 border flex items-center gap-4">
-        <div className="h-14 w-14 bg-gray-200 rounded-xl"></div>
-        <div className="space-y-2">
-          <div className="h-4 w-40 bg-gray-200 rounded"></div>
-          <div className="h-3 w-28 bg-gray-200 rounded"></div>
-        </div>
-      </div>
-
-      {/* INFO CARDS */}
-      <div className="grid sm:grid-cols-3 gap-4">
-        {[1, 2, 3].map((i) => (
-          <div key={i} className="bg-white rounded-2xl p-5 border space-y-2">
-            <div className="h-4 w-24 bg-gray-200 rounded"></div>
-            <div className="h-4 w-full bg-gray-200 rounded"></div>
-          </div>
-        ))}
-      </div>
-
-      {/* PROVIDER */}
-      <div className="grid sm:grid-cols-2 gap-6">
-        {[1, 2].map((i) => (
-          <div
-            key={i}
-            className="bg-white rounded-3xl p-6 border flex items-center gap-4"
-          >
-            <div className="h-14 w-14 bg-gray-200 rounded-full"></div>
-            <div className="space-y-2">
-              <div className="h-3 w-32 bg-gray-200 rounded"></div>
-              <div className="h-4 w-40 bg-gray-200 rounded"></div>
-              <div className="h-3 w-28 bg-gray-200 rounded"></div>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* PAYMENT */}
-      <div className="bg-white rounded-3xl p-6 border space-y-3">
-        <div className="h-5 w-40 bg-gray-200 rounded"></div>
-        {[1, 2, 3].map((i) => (
-          <div key={i} className="h-4 w-full bg-gray-200 rounded"></div>
-        ))}
+        <div className="h-7 w-28 bg-gray-200 rounded-full" />
       </div>
     </div>
   );
 }
 
-
 function BookingDetails() {
-  const { id } = useParams(); // bookingId
+  const { id } = useParams();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -111,36 +65,37 @@ function BookingDetails() {
   const [review, setReview] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
- useEffect(() => {
-  window.scrollTo(0, 0);
-  fetchBookingDetails();
-}, [fetchBookingDetails]);
-
-
+  /* ✅ DEFINE FIRST */
   const fetchBookingDetails = useCallback(async () => {
-  try {
-    const res = await getCustomerBookingDetails(id);
-    setData(res);
-  } catch (err) {
-    console.error("Failed to fetch booking details", err);
-  } finally {
-    setLoading(false);
-  }
-}, [id]);
+    try {
+      const res = await getCustomerBookingDetails(id);
+      setData(res);
+    } catch (err) {
+      console.error("Failed to fetch booking details", err);
+    } finally {
+      setLoading(false);
+    }
+  }, [id]);
 
- if (loading) {
-  return (
-    <>
-      <Navbar />
-      <section className="pt-28 pb-20 bg-[#F9FAFB]">
-        <div className="max-w-6xl mx-auto px-6">
-          <BookingDetailsSkeleton />
-        </div>
-      </section>
-      <Footer />
-    </>
-  );
-}
+  /* ✅ THEN USE */
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    fetchBookingDetails();
+  }, [fetchBookingDetails]);
+
+  if (loading) {
+    return (
+      <>
+        <Navbar />
+        <section className="pt-28 pb-20 bg-[#F9FAFB]">
+          <div className="max-w-6xl mx-auto px-6">
+            <BookingDetailsSkeleton />
+          </div>
+        </section>
+        <Footer />
+      </>
+    );
+  }
 
   if (!data) {
     return (
@@ -170,24 +125,21 @@ function BookingDetails() {
         <div className="max-w-6xl mx-auto px-6 space-y-8">
 
           {/* HEADER */}
-          <div className="bg-white rounded-3xl p-6 border flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="bg-white rounded-3xl p-6 border flex justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-[#111827]">
-                {service?.name}
-              </h1>
-              <p className="text-sm text-[#6B7280]">
+              <h1 className="text-2xl font-bold">{service?.name}</h1>
+              <p className="text-sm text-gray-500">
                 Booking ID #{booking.id}
               </p>
             </div>
-
             <span
-              className={`px-4 py-1 rounded-full text-sm font-semibold w-fit ${status.className}`}
+              className={`px-4 py-1 rounded-full text-sm font-semibold ${status.className}`}
             >
               {status.label}
             </span>
           </div>
 
-          {/* SERVICE */}
+          {/* SERVICE INFO */}
           <div className="bg-white rounded-3xl p-6 border flex items-center gap-4">
             <img
               src={service?.icon}
@@ -195,10 +147,8 @@ function BookingDetails() {
               className="h-14 w-14 rounded-xl object-cover"
             />
             <div>
-              <p className="font-semibold text-[#111827]">
-                {service?.name}
-              </p>
-              <p className="text-sm text-[#6B7280]">
+              <p className="font-semibold">{service?.name}</p>
+              <p className="text-sm text-gray-500">
                 {booking.booking_type === "instant"
                   ? "Instant Service"
                   : "Scheduled Service"}
@@ -206,7 +156,7 @@ function BookingDetails() {
             </div>
           </div>
 
-          {/* BOOKING INFO */}
+          {/* INFO */}
           <div className="grid sm:grid-cols-3 gap-4">
             <InfoCard
               icon={<Calendar size={18} />}
@@ -225,86 +175,50 @@ function BookingDetails() {
             />
           </div>
 
-          {/* PROVIDER & SERVICEMAN */}
+          {/* PROVIDER */}
           <div className="grid sm:grid-cols-2 gap-6">
-            {provider && (
-              <ProfileCard title="Service Provider" person={provider} />
-            )}
+            {provider && <ProfileCard title="Provider" person={provider} />}
             {serviceman && (
-              <ProfileCard title="Assigned Serviceman" person={serviceman} />
+              <ProfileCard title="Serviceman" person={serviceman} />
             )}
           </div>
 
           {/* PAYMENT */}
           {payment && (
             <div className="bg-white rounded-3xl p-6 border">
-              <h3 className="text-lg font-bold text-[#111827] mb-4">
-                Payment Details
-              </h3>
-
-              <div className="space-y-3 text-sm">
-                <Row
-                  label="Total Amount"
-                  value={`₹${payment.total_amount}`}
-                />
-                <Row
-                  label="Advance Paid"
-                  value={`₹${payment.advance_amount}`}
-                />
-                <Row
-                  label="Payment Type"
-                  value={payment.payment_type}
-                />
-              </div>
+              <h3 className="font-bold mb-3">Payment Details</h3>
+              <Row label="Total Amount" value={payment.total_amount} />
+              <Row label="Advance Paid" value={payment.advance_amount} />
+              <Row label="Payment Type" value={payment.payment_type} />
             </div>
           )}
 
-          {/* INSTRUCTIONS */}
-          {booking.instructions && (
-            <div className="bg-white rounded-3xl p-6 border">
-              <h3 className="text-lg font-bold text-[#111827] mb-2">
-                Customer Instructions
-              </h3>
-              <p className="text-sm text-[#374151]">
-                {booking.instructions}
-              </p>
-            </div>
-          )}
-
-          {/* ⭐ RATING */}
+          {/* RATING */}
           {booking.status === "COMPLETED" && (
             <div className="bg-white rounded-3xl p-6 border">
-              <h3 className="text-lg font-bold text-[#111827] mb-4">
-                Rate Your Experience
-              </h3>
+              <h3 className="font-bold mb-3">Rate Experience</h3>
 
-              <div className="flex items-center gap-2 mb-4">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <button
-                    key={star}
-                    onClick={() => setRating(star)}
-                  >
-                    <Star
-                      size={28}
-                      className={
-                        star <= rating
-                          ? "text-yellow-400 fill-yellow-400"
-                          : "text-gray-300"
-                      }
-                    />
-                  </button>
+              <div className="flex gap-2 mb-4">
+                {[1, 2, 3, 4, 5].map((s) => (
+                  <Star
+                    key={s}
+                    size={28}
+                    onClick={() => setRating(s)}
+                    className={
+                      s <= rating
+                        ? "text-yellow-400 fill-yellow-400 cursor-pointer"
+                        : "text-gray-300 cursor-pointer"
+                    }
+                  />
                 ))}
-                <span className="ml-3 text-sm text-[#6B7280]">
-                  {rating ? `${rating}/5` : "Tap to rate"}
-                </span>
               </div>
 
               <textarea
                 rows={4}
                 value={review}
                 onChange={(e) => setReview(e.target.value)}
-                placeholder="Share your experience (optional)"
-                className="w-full rounded-2xl border px-4 py-3 text-sm focus:border-[#00C389] outline-none resize-none"
+                className="w-full border rounded-xl p-3 text-sm"
+                placeholder="Write review..."
               />
 
               <button
@@ -316,17 +230,15 @@ function BookingDetails() {
                     setSubmitting(false);
                   }, 1000);
                 }}
-                className="mt-4 w-full bg-[#00C389] text-white py-3 rounded-full font-semibold hover:bg-emerald-600 transition disabled:opacity-50"
+                className="mt-4 w-full bg-[#00C389] text-white py-3 rounded-full disabled:opacity-50"
               >
                 {submitting ? "Submitting..." : "Submit Review"}
               </button>
             </div>
           )}
 
-          {/* FOOTER NOTE */}
-          <p className="text-xs text-center text-[#6B7280] flex justify-center items-center gap-1">
-            <ShieldCheck size={14} className="text-[#00C389]" />
-            Safe & secure service guaranteed
+          <p className="text-xs text-center text-gray-500 flex justify-center gap-1">
+            <ShieldCheck size={14} /> Safe & secure service
           </p>
 
         </div>
@@ -337,7 +249,7 @@ function BookingDetails() {
   );
 }
 
-/* ---------- SMALL COMPONENTS ---------- */
+/* SMALL COMPONENTS */
 
 const InfoCard = ({ icon, label, value }) => (
   <div className="bg-white rounded-2xl p-5 border">
@@ -345,21 +257,21 @@ const InfoCard = ({ icon, label, value }) => (
       {icon}
       <p className="text-sm font-medium">{label}</p>
     </div>
-    <p className="text-sm text-[#374151]">{value}</p>
+    <p className="text-sm">{value}</p>
   </div>
 );
 
 const ProfileCard = ({ title, person }) => (
-  <div className="bg-white rounded-3xl p-6 border flex items-center gap-4">
+  <div className="bg-white rounded-3xl p-6 border flex gap-4">
     <img
       src={person.profile_photo}
       alt={person.name}
-      className="h-14 w-14 rounded-full object-cover"
+      className="h-14 w-14 rounded-full"
     />
     <div>
-      <p className="text-sm text-[#6B7280]">{title}</p>
-      <p className="font-semibold text-[#111827]">{person.name}</p>
-      <p className="text-sm text-[#6B7280] flex items-center gap-1">
+      <p className="text-sm text-gray-500">{title}</p>
+      <p className="font-semibold">{person.name}</p>
+      <p className="text-sm flex gap-1">
         <Phone size={14} /> {person.phone}
       </p>
     </div>
@@ -367,11 +279,11 @@ const ProfileCard = ({ title, person }) => (
 );
 
 const Row = ({ label, value }) => (
-  <div className="flex items-center justify-between">
-    <p className="text-[#6B7280]">{label}</p>
-    <p className="font-semibold text-[#111827] flex items-center gap-1">
+  <div className="flex justify-between text-sm">
+    <span className="text-gray-500">{label}</span>
+    <span className="font-semibold flex items-center gap-1">
       <IndianRupee size={14} /> {value}
-    </p>
+    </span>
   </div>
 );
 
