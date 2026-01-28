@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+
 import {
   Calendar,
   Clock,
@@ -110,21 +111,22 @@ function BookingDetails() {
   const [review, setReview] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  useEffect(() => {
-    window.scrollTo(0, 0);
-    fetchBookingDetails();
-  }, [id]);
+ useEffect(() => {
+  window.scrollTo(0, 0);
+  fetchBookingDetails();
+}, [fetchBookingDetails]);
 
-  const fetchBookingDetails = async () => {
-    try {
-      const res = await getCustomerBookingDetails(id);
-      setData(res);
-    } catch (err) {
-      console.error("Failed to fetch booking details", err);
-    } finally {
-      setLoading(false);
-    }
-  };
+
+  const fetchBookingDetails = useCallback(async () => {
+  try {
+    const res = await getCustomerBookingDetails(id);
+    setData(res);
+  } catch (err) {
+    console.error("Failed to fetch booking details", err);
+  } finally {
+    setLoading(false);
+  }
+}, [id]);
 
  if (loading) {
   return (
