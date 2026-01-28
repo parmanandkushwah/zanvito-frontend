@@ -8,6 +8,7 @@ import Newsletter from "../components/Newsletter";
 import Footer from "../components/Footer";
 
 import { getHomeData } from "../api/homeApi";
+import { useAvailability } from "../context/AvailabilityContext";
 
 /* SKELETONS */
 import HeroSkeleton from "../components/skeletons/HeroSkeleton";
@@ -23,6 +24,12 @@ function Home() {
   const [services, setServices] = useState([]);
   const [featuredServices, setFeaturedServices] = useState([]);
 
+  // ✅ SINGLE SOURCE OF TRUTH
+  const { serviceAvailable } = useAvailability();
+
+  /* ===============================
+     FETCH HOME DATA
+  =============================== */
   useEffect(() => {
     fetchHomeData();
   }, []);
@@ -47,8 +54,38 @@ function Home() {
     <>
       <Navbar />
 
-      <div className="bg-[#F9FAFB]">
+         {/* 🔴 COMING SOON OVERLAY */}
+      {!serviceAvailable && (
+        <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/40">
+          <div className="bg-white rounded-2xl shadow-2xl p-6 max-w-md text-center">
+            <h2 className="text-xl font-bold text-gray-800 mb-2">
+              🚧 Coming Soon
+            </h2>
+            <p className="text-gray-600 mb-4">
+              Services are not available in your area yet.
+              Please change your location.
+            </p>
 
+            <button
+              onClick={() =>
+                document.getElementById("location-button")?.click()
+              }
+              className="bg-[#00C389] text-white px-6 py-2 rounded-xl hover:bg-emerald-600 transition"
+            >
+              Change Location
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* 🔒 PAGE CONTENT */}
+      <div
+        className={`transition-all duration-300 ${
+          !serviceAvailable
+            ? "grayscale opacity-60 pointer-events-none"
+            : ""
+        }`}
+      >
         {loading ? <HeroSkeleton /> : <HeroSection banners={banners} />}
 
         {loading ? (

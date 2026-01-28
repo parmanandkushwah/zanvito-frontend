@@ -40,7 +40,10 @@ function HeroSection({ banners = [] }) {
               placeholder="Search Service"
               className="flex-1 px-6 py-4 text-[#111827] placeholder-[#6B7280] focus:outline-none"
             />
-            <button className="bg-[#00C389] text-white px-8 py-4 font-semibold hover:bg-emerald-600 transition">
+            <button
+              type="button"   // 🔥 THIS IS THE FIX
+              className="bg-[#00C389] text-white px-8 py-4 font-semibold hover:bg-emerald-600 transition"
+            >
               Find Service
             </button>
           </div>

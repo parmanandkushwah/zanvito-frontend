@@ -2,10 +2,18 @@ import axios from "axios";
 
 const api = axios.create({
   baseURL: "https://quickfix-z904.onrender.com/api",
-  withCredentials: true,
   headers: {
     "Content-Type": "application/json",
   },
+});
+
+// 🔑 AUTO ATTACH TOKEN
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem("token");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
 });
 
 export default api;
