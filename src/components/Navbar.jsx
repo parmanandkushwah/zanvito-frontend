@@ -12,7 +12,8 @@ import {
 
 function Navbar() {
   const navigate = useNavigate();
-  const dropdownRef = useRef(null);
+ const dropdownRef = useRef(null);       // location
+const userDropdownRef = useRef(null);   // user menu
 
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
@@ -29,10 +30,11 @@ const { setServiceAvailable } = useAvailability();
   const [searchText, setSearchText] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [searchLoading, setSearchLoading] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
 
   // 🔐 AUTH
   const token = localStorage.getItem("token");
-  const user = JSON.parse(localStorage.getItem("user"));
+ const user = JSON.parse(localStorage.getItem("user") || "{}");
 
   /* SCROLL EFFECT */
   useEffect(() => {
@@ -42,70 +44,92 @@ const { setServiceAvailable } = useAvailability();
   }, []);
 
   /* CLICK OUTSIDE */
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
-        setOpen(false);
-        setLocationOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () =>
-      document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+useEffect(() => {
+  const handleClickOutside = (e) => {
+    if (
+      dropdownRef.current &&
+      !dropdownRef.current.contains(e.target)
+    ) {
+      setLocationOpen(false);
+    }
+
+    if (
+      userDropdownRef.current &&
+      !userDropdownRef.current.contains(e.target)
+    ) {
+      setOpen(false);
+      setProfileOpen(false); 
+    }
+  };
+
+  document.addEventListener("mousedown", handleClickOutside);
+  return () =>
+    document.removeEventListener("mousedown", handleClickOutside);
+}, []);
+
+const ensureLoggedIn = () => {
+  if (!token) {
+    setLocationError("Please login to select location");
+    return false;
+  }
+  return true;
+};
 
   /* ===============================
      📡 USE CURRENT LOCATION
   =============================== */
   const handleUseCurrentLocation = () => {
-    setLocationError("");
+  setLocationError("");
 
-    if (!navigator.geolocation) {
-      setLocationError("Geolocation not supported");
-      return;
-    }
+  if (!ensureLoggedIn()) return;
 
-    setLoadingLocation(true);
+  if (!navigator.geolocation) {
+    setLocationError("Geolocation not supported");
+    return;
+  }
 
-    navigator.geolocation.getCurrentPosition(
-      async (pos) => {
-        try {
-          const lat = pos.coords.latitude;
-          const lng = pos.coords.longitude;
+  setLoadingLocation(true);
 
-          const address = await reverseGeocode(lat, lng);
+  navigator.geolocation.getCurrentPosition(
+    async (pos) => {
+      try {
+        const lat = pos.coords.latitude;
+        const lng = pos.coords.longitude;
 
-          await saveCustomerLocation({
-            latitude: lat,
-            longitude: lng,
-            address,
-          });
+        const address = await reverseGeocode(lat, lng);
 
-          localStorage.setItem("user_location", address);
-          setSelectedLocation(address);
+        await saveCustomerLocation({
+          latitude: lat,
+          longitude: lng,
+          address,
+        });
 
-          const availability = await checkProviderAvailability(lat, lng);
-          setLocationOpen(false);
-if (!availability.available) {
-  setServiceAvailable(false);
-  localStorage.setItem("service_available", "false");
-} else {
-  setServiceAvailable(true);
-  localStorage.setItem("service_available", "true");
-}
-        } catch (err) {
-          console.error(err);
-          setLocationError("Unable to detect location");
-        } finally {
-          setLoadingLocation(false);
+        localStorage.setItem("user_location", address);
+        setSelectedLocation(address);
+
+        const availability = await checkProviderAvailability(lat, lng);
+        setLocationOpen(false);
+
+        if (!availability.available) {
+          setServiceAvailable(false);
+          localStorage.setItem("service_available", "false");
+          setLocationError("Service not available in this area");
+        } else {
+          setServiceAvailable(true);
+          localStorage.setItem("service_available", "true");
         }
-      },
-      () => {
-        setLocationError("Location permission denied");
+      } catch (err) {
+        setLocationError("Unable to detect your current location");
+      } finally {
         setLoadingLocation(false);
       }
-    );
-  };
+    },
+    () => {
+      setLocationError("Location permission denied");
+      setLoadingLocation(false);
+    }
+  );
+};
 
   /* ===============================
      🔍 MANUAL LOCATION SEARCH
@@ -133,10 +157,18 @@ if (!availability.available) {
     }
   };
 
+  
+ 
   /* ===============================
      📍 SELECT MANUAL LOCATION
   =============================== */
   const handleSelectLocation = async (loc) => {
+  setLocationError("");
+
+  if (!token) {
+    setLocationError("Please login to select location");
+    return;
+  }
     try {
       setLoadingLocation(true);
 
@@ -311,81 +343,170 @@ if (!availability.available) {
           ))}
         </nav>
 
-        {/* RIGHT */}
-        <div className="flex items-center gap-4 relative">
-          {!token ? (
-            <button
-              onClick={() => navigate("/login")}
-              className="
-                border border-[#111827]/30 px-6 py-2 rounded-full
-                text-[#111827] font-medium
-                hover:bg-[#00C389] hover:text-white transition
-              "
-            >
-              Login now
-            </button>
-          ) : (
-            <div className="relative">
-              <button
-                onClick={() => setOpen(!open)}
-                className="
-                  h-10 w-10 rounded-full
-                  flex items-center justify-center
-                  text-white font-semibold
-                  shadow-md transition hover:scale-105
-                "
-                style={{
-                  background:
-                    "linear-gradient(180deg, #00C389 0%, #007A57 70%, #003D2B 100%)",
-                }}
-              >
-                {user?.name
-                  ? user.name.charAt(0).toUpperCase()
-                  : <User size={18} />}
-              </button>
+      {/* RIGHT */}
+<div className="flex items-center gap-4" ref={userDropdownRef}>
+  {!token ? (
+    <button
+      onClick={() => navigate("/login")}
+      className="
+        border border-[#111827]/30 px-6 py-2 rounded-full
+        text-[#111827] font-medium
+        hover:bg-[#00C389] hover:text-white transition
+      "
+    >
+      Login now
+    </button>
+  ) : (
+    <div className="relative inline-block">
+      {/* PROFILE ICON */}
+      <button
+        onClick={() => {
+          setOpen((prev) => !prev);
+          setProfileOpen(false);
+        }}
+        className="
+          h-10 w-10 rounded-full
+          flex items-center justify-center
+          text-white font-semibold
+          shadow-md transition hover:scale-105
+        "
+        style={{
+          background:
+            "linear-gradient(180deg, #00C389 0%, #007A57 70%, #003D2B 100%)",
+        }}
+      >
+        {user?.profile_photo ? (
+          <img
+            src={user.profile_photo}
+            alt="profile"
+            className="h-full w-full object-cover rounded-full"
+          />
+        ) : user?.name ? (
+          user.name.charAt(0).toUpperCase()
+        ) : (
+          <User size={18} />
+        )}
+      </button>
 
-              <div
-                className={`absolute right-0 mt-3 w-52 rounded-2xl
-                bg-white/90 backdrop-blur-lg shadow-xl border border-black/5
-                transform transition-all duration-200 origin-top-right
-                ${
-                  open
-                    ? "scale-100 opacity-100"
-                    : "scale-95 opacity-0 pointer-events-none"
-                }`}
-              >
-                <div className="px-4 py-3 border-b">
-                  <p className="text-sm font-semibold text-[#111827]">
-                    {user?.name || "User"}
-                  </p>
-                  <p className="text-xs text-gray-500">Logged in</p>
-                </div>
+      {/* MAIN DROPDOWN */}
+      {open && (
+        <div
+          className="
+            absolute right-0 top-12 w-52
+            bg-white/90 backdrop-blur-lg
+            shadow-xl border border-black/5
+            rounded-2xl z-50
+          "
+        >
+          <div className="px-4 py-3 border-b">
+            <p className="text-sm font-semibold text-[#111827]">
+              {user?.name || "User"}
+            </p>
+            <p className="text-xs text-gray-500">Logged in</p>
+          </div>
 
-                <button
-                  onClick={() => {
-                    navigate("/profile");
-                    setOpen(false);
-                  }}
-                  className="w-full px-4 py-3 text-left text-sm hover:bg-[#00C389]/10"
-                >
-                  My Profile
-                </button>
+          <button
+            onClick={() => {
+              setOpen(false);
+              setProfileOpen(true);
+            }}
+            className="w-full px-4 py-3 text-left text-sm hover:bg-[#00C389]/10"
+          >
+            My Profile
+          </button>
 
-                <button
-                  onClick={() => {
-                    localStorage.clear();
-                    navigate("/login");
-                    window.location.reload();
-                  }}
-                  className="w-full px-4 py-3 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
-                >
-                  <LogOut size={16} />
-                  Logout
-                </button>
-              </div>
-            </div>
-          )}
+          <button
+            onClick={() => {
+              localStorage.clear();
+              setOpen(false);
+              setProfileOpen(false);
+              setLocationOpen(false);
+              navigate("/login", { replace: true });
+            }}
+            className="
+              w-full px-4 py-3 text-left text-sm
+              text-red-600 hover:bg-red-50
+              flex items-center gap-2
+            "
+          >
+            <LogOut size={16} />
+            Logout
+          </button>
         </div>
+      )}
+
+      {/* PROFILE INFO DROPDOWN */}
+      {profileOpen && (
+        <div
+          className="
+            absolute right-0 top-12 w-80
+            bg-white/90 backdrop-blur-xl
+            shadow-2xl border border-black/5
+            rounded-2xl p-5 z-50
+          "
+        >
+          <div className="flex items-center gap-4 pb-4 border-b">
+            <div
+              className="h-14 w-14 rounded-full
+                         flex items-center justify-center
+                         text-white text-xl font-bold"
+              style={{
+                background:
+                  "linear-gradient(180deg, #00C389 0%, #007A57 70%, #003D2B 100%)",
+              }}
+            >
+              {user?.profile_photo ? (
+                <img
+                  src={user.profile_photo}
+                  alt="profile"
+                  className="h-full w-full object-cover rounded-full"
+                />
+              ) : (
+                user?.name?.charAt(0).toUpperCase()
+              )}
+            </div>
+
+            <div>
+              <p className="font-semibold text-[#111827]">
+                {user?.name}
+              </p>
+              <p className="text-xs text-gray-500">
+                +91 {user?.phone}
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-4 space-y-2 text-sm text-gray-600">
+            {user?.email && (
+              <p><b>Email:</b> {user.email}</p>
+            )}
+            {user?.address && (
+              <p className="line-clamp-2">
+                <b>Address:</b> {user.address}
+              </p>
+            )}
+          </div>
+
+          <button
+            onClick={() => setProfileOpen(false)}
+            className="
+              mt-5 w-full
+              border border-[#00C389]
+              text-[#00C389]
+              py-2 rounded-xl
+              font-medium
+              hover:bg-[#00C389] hover:text-white
+              transition
+            "
+          >
+            Close
+          </button>
+        </div>
+      )}
+    </div>
+  )}
+</div>
+
       </div>
     </header>
   );

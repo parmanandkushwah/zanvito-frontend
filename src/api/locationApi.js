@@ -70,3 +70,24 @@ export const checkProviderAvailability = async (lat, lng) => {
   console.log("📊 Availability:", res.data);
   return res.data; // { available: true / false }
 };
+
+
+export const searchLocation = async (query) => {
+  if (!query) return [];
+
+  const res = await fetch(
+    `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(
+      query
+    )}&format=json&addressdetails=1&limit=5`,
+    {
+      headers: {
+        "Accept": "application/json",
+        "User-Agent": "Zanvito-Web-App/1.0 (contact@zanvito.com)",
+      },
+    }
+  );
+
+  if (!res.ok) return [];
+
+  return await res.json();
+};

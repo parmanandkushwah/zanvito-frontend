@@ -78,8 +78,13 @@ function OtpVerify() {
       localStorage.setItem("token", data.token);
     }
 
+    if (data.user) {
+        localStorage.setItem("user", JSON.stringify(data.user));
+      }
+
  // OTP verify success ke baad
-localStorage.setItem("token", data.token);
+// localStorage.setItem("token", data.token);
+// localStorage.setItem("user", JSON.stringify(data.user));
 
 if (data.needs_registration) {
   navigate("/signup", {

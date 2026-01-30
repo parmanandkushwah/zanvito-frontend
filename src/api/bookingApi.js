@@ -16,3 +16,33 @@ export const getCustomerBookingDetails = async (bookingId) => {
   const res = await api.get(`/bookings/customer/${bookingId}`);
   return res.data;
 };
+
+export const createBookingDraft = async (payload) => {
+  const res = await api.post("/booking-draft/create", payload);
+  return res.data;
+};
+
+
+export const getBookingBill = async (draftId) => {
+  const res = await api.get(`/booking-draft/${draftId}/bill`);
+  return res.data;
+};
+
+export const updateBookingDateTime = async (draftId, payload) => {
+  const res = await api.patch(
+    `/${draftId}/update-time`,
+    payload
+  );
+  return res.data;
+};
+
+
+export const checkoutBooking = async (payload) => {
+  const res = await api.post("/bookings/checkout", payload);
+  return res.data;
+};
+
+export const getBookingPaymentStatus = async (bookingId) => {
+  const res = await api.get(`/bookings/${bookingId}/payment-status`);
+  return res.data;
+};
