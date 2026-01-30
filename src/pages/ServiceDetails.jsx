@@ -2,8 +2,8 @@ import React, { useEffect, useState, useCallback } from "react";
 import { useParams,useNavigate } from "react-router-dom";
 import {
   MapPin,
-  Calendar,
-  Clock,
+  // Calendar,
+  // Clock,
   ShieldCheck,
   Star,
   XCircle, Loader2
@@ -183,7 +183,7 @@ const getCurrentLocation = async () => {
 
 
 const handleLocationSearch = async (value) => {
-  setLocationQuery(value);
+  // setLocationQuery(value);
   setLocationLabel(value);
 
   if (value.length < 3) {
@@ -239,7 +239,7 @@ const handleSelectLocation = (item) => {
   if (step === 2 && draftId) {
     fetchBillDetails();
   }
-}, [step, draftId]);
+}, [step, draftId, fetchBillDetails]);
 
 // ================= FETCH PAYMENT STATUS =================
 const fetchPaymentStatus = async (bookingId) => {
@@ -264,7 +264,7 @@ useEffect(() => {
   }
 }, [billData]);
 
-const fetchBillDetails = async () => {
+const fetchBillDetails = useCallback(async () => {
   try {
     setBillLoading(true);
     const data = await getBookingBill(draftId);
@@ -274,7 +274,7 @@ const fetchBillDetails = async () => {
   } finally {
     setBillLoading(false);
   }
-};
+}, [draftId]);
 
   /* ---------------- LOADING ---------------- */
   if (loading) {
