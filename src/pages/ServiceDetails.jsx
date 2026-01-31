@@ -299,25 +299,25 @@ const fetchBillDetails = useCallback(async () => {
     );
   }
 
-  /* ================= CREATE BOOKING ================= */
-  const handleCreateBooking = () => {
-    const payload = {
-      service_id: bookingData.service_id,
-      latitude: bookingData.latitude,
-      longitude: bookingData.longitude,
-      address: bookingData.address,
-      booking_type: bookingData.booking_type,
-      instructions: bookingData.instructions,
-    };
+  // /* ================= CREATE BOOKING ================= */
+  // const handleCreateBooking = () => {
+  //   const payload = {
+  //     service_id: bookingData.service_id,
+  //     latitude: bookingData.latitude,
+  //     longitude: bookingData.longitude,
+  //     address: bookingData.address,
+  //     booking_type: bookingData.booking_type,
+  //     instructions: bookingData.instructions,
+  //   };
 
-    if (bookingData.booking_type === "scheduled") {
-      payload.booking_date = bookingData.booking_date;
-      payload.booking_time = bookingData.booking_time;
-    }
+  //   if (bookingData.booking_type === "scheduled") {
+  //     payload.booking_date = bookingData.booking_date;
+  //     payload.booking_time = bookingData.booking_time;
+  //   }
 
-    console.log("BOOKING PAYLOAD 👉", payload);
-    // API CALL HERE
-  };
+  //   console.log("BOOKING PAYLOAD 👉", payload);
+  //   // API CALL HERE
+  // };
 
   return (
     <>
