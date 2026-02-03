@@ -132,7 +132,7 @@ const closeAndGoHome = () => {
 
 const [locationLoading, setLocationLoading] = useState(false);
  const [locationLabel, setLocationLabel] = useState("");
- const [locationQuery, setLocationQuery] = useState("");
+//  const [locationQuery, setLocationQuery] = useState("");
 const [locationResults, setLocationResults] = useState([]);
 
 const [formMessage, setFormMessage] = useState({
@@ -203,7 +203,7 @@ const handleSelectLocation = (item) => {
   }));
 
   setLocationLabel(item.display_name);
-  setLocationQuery("");
+  // setLocationQuery("");
   setLocationResults([]);
 };
 
@@ -235,12 +235,7 @@ const handleSelectLocation = (item) => {
   }, [fetchService]);
 
   // ================= FETCH BILL WHEN DRAFT ID CHANGES =================
-  useEffect(() => {
-  if (step === 2 && draftId) {
-    fetchBillDetails();
-  }
-}, [step, draftId, fetchBillDetails]);
-
+  
 // ================= FETCH PAYMENT STATUS =================
 const fetchPaymentStatus = async (bookingId) => {
   try {
@@ -275,6 +270,13 @@ const fetchBillDetails = useCallback(async () => {
     setBillLoading(false);
   }
 }, [draftId]);
+
+useEffect(() => {
+  if (step === 2 && draftId) {
+    fetchBillDetails();
+  }
+}, [step, draftId, fetchBillDetails]);
+
 
   /* ---------------- LOADING ---------------- */
   if (loading) {
