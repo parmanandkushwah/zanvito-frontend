@@ -73,7 +73,7 @@ function FeaturedServices({ services = [] }) {
                 <div className="relative h-40">
                   <img
   src={
-    getImageUrl(service.featured_image) ||
+    getImageUrl(service.image) ||
     "https://via.placeholder.com/300x200?text=Service"
   }
   alt={service.name}
