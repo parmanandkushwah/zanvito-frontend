@@ -2,33 +2,41 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import { Search, ArrowRight } from "lucide-react";
+import { Search, ArrowRight, ChevronRight } from "lucide-react";
 import { getHomeData } from "../api/homeApi";
 import AllCategoriesSkeleton from "../components/skeletons/AllCategoriesSkeleton";
 import { useAvailability } from "../context/AvailabilityContext";
+import { getImageUrl } from "../utils/getImageUrl";
 
 function AllCategories() {
   const navigate = useNavigate();
   const { serviceAvailable } = useAvailability(); // 🔥 IMPORTANT
-
+const [services, setServices] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [services, setServices] = useState([]);
+  // const [services, setServices] = useState([]);
   const [activeCategoryId, setActiveCategoryId] = useState(null);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
+  const [activeSubCategoryId, setActiveSubCategoryId] = useState(null);
 
   /* ================= FETCH DATA ================= */
   useEffect(() => {
     fetchData();
   }, []);
 
+const getServicesBySubCategory = (subCategoryId) => {
+  return services.filter(
+    (s) => Number(s.sub_category_id) === Number(subCategoryId)
+  );
+};
+
   const fetchData = async () => {
     try {
       const res = await getHomeData();
       if (res?.success) {
-        setCategories(res.categories || []);
-        setServices(res.services || []);
-      }
+  setCategories(res.categories || []);
+  setServices(res.services || []);
+}
     } catch (err) {
       console.error("AllCategories Error:", err);
     } finally {
@@ -39,25 +47,38 @@ function AllCategories() {
   /* ================= DEFAULT CATEGORY ================= */
   useEffect(() => {
     if (categories.length && !activeCategoryId) {
-      setActiveCategoryId(categories[0].id);
+     setActiveCategoryId(
+  categories[0].id ?? categories[0].category_id
+);
     }
   }, [categories, activeCategoryId]);
 
   /* ================= FILTER SERVICES ================= */
-  const filteredServices = useMemo(() => {
-    if (!activeCategoryId) return [];
-    return services
-      .filter(
-        (s) => Number(s.category_id) === Number(activeCategoryId)
-      )
-      .filter((s) =>
-        s.name.toLowerCase().includes(search.toLowerCase())
-      );
-  }, [services, activeCategoryId, search]);
+  // const filteredServices = useMemo(() => {
+  //   if (!activeCategoryId) return [];
+  //   return services
+  //     .filter(
+  //       (s) => Number(s.category_id) === Number(activeCategoryId)
+  //     )
+  //     .filter((s) =>
+  //       s.name.toLowerCase().includes(search.toLowerCase())
+  //     );
+  // }, [services, activeCategoryId, search]);
 
-  const activeCategory = categories.find(
-    (c) => Number(c.id) === Number(activeCategoryId)
+  
+ const activeCategory = useMemo(() => {
+  return categories.find(
+    (c) =>
+      Number(c.id ?? c.category_id) ===
+      Number(activeCategoryId)
   );
+}, [categories, activeCategoryId]);
+
+const filteredSubCategories = useMemo(() => {
+  if (!activeCategory) return [];
+  return activeCategory.sub_categories || [];
+}, [activeCategory]);
+
 
   return (
     <>
@@ -129,15 +150,23 @@ function AllCategories() {
 
                   {/* LEFT */}
                   <div className="bg-white rounded-3xl border p-4 space-y-3 max-h-[70vh] overflow-y-auto">
-                    {categories.map((cat) => {
-                      const active =
-                        Number(activeCategoryId) === Number(cat.id);
+                     <h2 className="text-2xl font-bold text-[#111827] mb-8">
+    Categories
+  </h2>
+                   {categories.map((cat) => {
+  const catId = cat.id ?? cat.category_id;
+  const catName = (cat.name ?? cat.category_name)?.trim();
+  const catIcon = cat.icon ?? cat.category_icon;
+
+  const active =
+    Number(activeCategoryId) === Number(catId);
 
                       return (
                         <button
-                          key={cat.id}
+                          key={catId}
                           onClick={() => {
-                            setActiveCategoryId(cat.id);
+                            setActiveCategoryId(catId);
+
                             setSearch("");
                           }}
                           className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl transition ${
@@ -154,13 +183,13 @@ function AllCategories() {
                             }`}
                           >
                             <img
-                              src={cat.icon}
-                              alt={cat.name}
+                              src={getImageUrl(catIcon)}
+                              alt={catName}
                               className="h-5 w-5"
                             />
                           </div>
                           <span className="font-medium text-sm">
-                            {cat.name}
+                            {catName}
                           </span>
                         </button>
                       );
@@ -168,42 +197,125 @@ function AllCategories() {
                   </div>
 
                   {/* RIGHT */}
-                  <div className="lg:col-span-3 bg-white rounded-3xl p-8 border shadow-sm">
-                    <h2 className="text-xl font-bold text-[#111827] mb-6">
-                      {activeCategory?.name} Services
-                    </h2>
+                 <div className="lg:col-span-3 bg-white rounded-3xl p-8 border shadow-sm">
+  {/* TITLE */}
+  <h2 className="text-2xl font-bold text-[#111827] mb-8">
+    {activeCategory?.category_name} Services
+  </h2>
 
-                    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                      {!filteredServices.length && (
-                        <p className="text-sm text-[#6B7280]">
-                          No services found
-                        </p>
-                      )}
+  <div className="space-y-5">
+    {!filteredSubCategories.length && (
+      <p className="text-sm text-[#6B7280]">
+        No sub-categories found
+      </p>
+    )}
 
-                      {filteredServices.map((service) => (
-                        <div
-                          key={service.id}
-                          onClick={() =>
-                            navigate(`/services/${service.id}`)
-                          }
-                          className="cursor-pointer bg-[#F9FAFB] border rounded-2xl p-5 hover:border-[#00C389] hover:shadow-lg transition flex items-center justify-between"
-                        >
-                          <div>
-                            <p className="font-semibold text-[#111827]">
-                              {service.name}
-                            </p>
-                            <p className="text-sm text-[#6B7280] mt-1">
-                              Starting from ₹{service.starting_from}
-                            </p>
-                          </div>
+    {filteredSubCategories.map((sub) => {
+      const isOpen = activeSubCategoryId === sub.id;
+      const subServices = getServicesBySubCategory(sub.id);
 
-                          <div className="h-9 w-9 rounded-full bg-[#00C389]/10 flex items-center justify-center">
-                            <ArrowRight size={16} className="text-[#00C389]" />
-                          </div>
-                        </div>
-                      ))}
+      return (
+        <div
+          key={sub.id}
+          className="rounded-2xl border border-[#E5E7EB] bg-[#FAFAFA] overflow-hidden transition"
+        >
+          {/* SUB CATEGORY HEADER */}
+          <button
+            onClick={() =>
+              setActiveSubCategoryId(isOpen ? null : sub.id)
+            }
+            className="w-full flex items-center justify-between px-6 py-5 hover:bg-white transition"
+          >
+            <div className="flex items-center gap-4">
+              <div className="h-12 w-12 rounded-xl bg-[#00C389]/10 flex items-center justify-center overflow-hidden">
+                <img
+                  src={getImageUrl(sub.icon)}
+                  alt={sub.name}
+                  className="h-7 w-7 object-contain"
+                />
+              </div>
+
+              <div className="text-left">
+                <p className="text-base font-semibold text-[#111827]">
+                  {sub.name}
+                </p>
+                <p className="text-xs text-[#6B7280]">
+                  {subServices.length} services available
+                </p>
+              </div>
+            </div>
+
+            <ChevronRight
+              size={20}
+              className={`text-[#00C389] transition-transform duration-300 ${
+                isOpen ? "rotate-90" : ""
+              }`}
+            />
+          </button>
+
+          {/* SERVICES */}
+          {isOpen && (
+            <div className="px-6 pb-6 pt-2 grid sm:grid-cols-2 lg:grid-cols-3 gap-5 animate-fadeIn">
+              {!subServices.length && (
+                <p className="text-sm text-[#6B7280] col-span-full">
+                  No services available
+                </p>
+              )}
+
+              {subServices.map((service) => (
+                <div
+                  key={service.id}
+                  onClick={() =>
+                    navigate(`/services/${service.id}`)
+                  }
+                  className="group cursor-pointer bg-white rounded-2xl border hover:border-[#00C389] hover:shadow-xl transition overflow-hidden"
+                >
+                  {/* IMAGE */}
+                  <div className="relative h-36 overflow-hidden">
+                    <img
+                      src={
+                        getImageUrl(service.image) ||
+                        "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png"
+                      }
+                      alt={service.name}
+                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+
+                    {/* PRICE BADGE */}
+                    <span className="absolute top-3 left-3 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-xs font-semibold text-[#111827] shadow">
+                      ₹{service.starting_from}
+                    </span>
+                  </div>
+
+                  {/* CONTENT */}
+                  <div className="p-4">
+                    <p className="font-semibold text-[#111827] text-sm">
+                      {service.name}
+                    </p>
+
+                    <p className="text-xs text-[#6B7280] mt-1">
+                      Professional & verified experts
+                    </p>
+
+                    <div className="mt-4 flex items-center justify-between">
+                      <span className="text-sm font-medium text-[#00C389]">
+                        Book Now
+                      </span>
+                      <ArrowRight
+                        size={16}
+                        className="text-[#00C389]"
+                      />
                     </div>
                   </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      );
+    })}
+  </div>
+</div>
 
                 </div>
               </div>

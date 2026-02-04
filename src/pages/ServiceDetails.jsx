@@ -16,6 +16,7 @@ import { reverseGeocode, searchLocation } from "../api/locationApi";
 import { createBookingDraft, getBookingBill, updateBookingDateTime, checkoutBooking, getBookingPaymentStatus } from "../api/bookingApi";
 // import { Cashfree } from "@cashfreepayments/pg-react";
 // import { load } from "@cashfreepayments/cashfree-js";
+import { getImageUrl } from "../utils/getImageUrl";
 
 
 
@@ -332,38 +333,52 @@ useEffect(() => {
           <div className="lg:col-span-2 space-y-8">
 
             {/* HERO CARD */}
-            <div className="bg-gradient-to-r from-[#00C389]/10 to-white rounded-3xl p-8 border">
-              <div className="flex items-center gap-5">
-                <div className="h-16 w-16 rounded-2xl bg-[#00C389] flex items-center justify-center shadow-lg">
-                  <img
-                    src={service.icon}
-                    alt={service.name}
-                    className="h-8 w-8"
-                  />
-                </div>
+<div className="relative overflow-hidden rounded-3xl border bg-gradient-to-br from-[#00C389]/10 via-white to-white">
+  <div className="p-8 sm:p-10 flex flex-col sm:flex-row gap-8 items-start">
 
-                <div>
-                  <h1 className="text-3xl font-bold text-[#111827]">
-                    {service.name}
-                  </h1>
+    {/* IMAGE BLOCK */}
+    <div className="relative shrink-0">
+      <div className="h-32 w-32 sm:h-40 sm:w-40 rounded-3xl overflow-hidden bg-gray-100 shadow-2xl ring-1 ring-black/5">
+        <img
+          src={getImageUrl(service.image)}
+          alt={service.name}
+          onError={(e) => {
+            e.currentTarget.src =
+              "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png";
+          }}
+          className="h-full w-full object-cover transition-transform duration-500 hover:scale-105"
+        />
+      </div>
 
-                  <div className="mt-2 flex items-center gap-4">
-                    <span className="bg-[#00C389]/10 text-[#00C389] px-4 py-1 rounded-full text-sm font-semibold">
-                      Starting at ₹{service.starting_from}
-                    </span>
+      {/* PRICE BADGE */}
+      <span className="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-white px-4 py-1 rounded-full text-sm font-semibold text-[#111827] shadow-md">
+        ₹{service.starting_from}
+      </span>
+    </div>
 
-                    <span className="flex items-center gap-1 text-sm text-[#6B7280]">
-                      <Star size={14} className="text-yellow-400" />
-                      4.8 (2.3k reviews)
-                    </span>
-                  </div>
-                </div>
-              </div>
+    {/* CONTENT */}
+    <div className="flex-1">
+      <h1 className="text-3xl sm:text-4xl font-extrabold text-[#111827] leading-tight">
+        {service.name}
+      </h1>
 
-              <p className="mt-6 text-[#374151] leading-relaxed">
-                {service.description}
-              </p>
-            </div>
+      <div className="mt-3 flex flex-wrap items-center gap-4">
+        <span className="inline-flex items-center gap-1 text-sm text-[#6B7280]">
+          <Star size={14} className="text-yellow-400" />
+          4.8 (2.3k reviews)
+        </span>
+
+        <span className="text-sm text-[#00C389] font-semibold">
+          Verified Professionals
+        </span>
+      </div>
+
+      <p className="mt-5 max-w-2xl text-[#374151] leading-relaxed">
+        {service.description}
+      </p>
+    </div>
+  </div>
+</div>
 
             {/* INFO CARDS */}
             <div className="grid sm:grid-cols-3 gap-4">
@@ -663,10 +678,14 @@ setStep(2);
   <div className="flex items-start justify-between gap-4">
     <div className="flex items-center gap-4">
       <img
-        src={billData.service.icon}
-        alt={billData.service.name}
-        className="h-12 w-12 rounded-xl"
-      />
+  src={getImageUrl(billData.service.image)}
+  alt={billData.service.name}
+  onError={(e) => {
+    e.currentTarget.src =
+      "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png";
+  }}
+  className="h-12 w-12 rounded-xl object-cover"
+/>
 
       <div>
         <p className="font-semibold text-[#111827]">

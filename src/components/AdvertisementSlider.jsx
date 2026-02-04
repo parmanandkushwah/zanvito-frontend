@@ -4,6 +4,7 @@ import SwiperCore, { Pagination, Autoplay } from "swiper";
 
 import "swiper/css";
 import "swiper/css/pagination";
+import { getImageUrl } from "../utils/getImageUrl";
 
 SwiperCore.use([Pagination, Autoplay]);
 
@@ -24,7 +25,7 @@ function AdvertisementSlider({ banners = [] }) {
               <div
                 className="h-44 md:h-52 rounded-2xl overflow-hidden relative flex items-center shadow-xl"
                 style={{
-                  backgroundImage: `url(${banner.image_url})`,
+                  backgroundImage: `url(${getImageUrl(banner.image_url)})`,
                   backgroundSize: "cover",
                   backgroundPosition: "center",
                 }}

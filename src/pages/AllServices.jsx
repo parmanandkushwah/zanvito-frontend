@@ -7,6 +7,8 @@ import Footer from "../components/Footer";
 import { getHomeData } from "../api/homeApi";
 import AllServicesSkeleton from "../components/skeletons/AllServicesSkeleton";
 import { useAvailability } from "../context/AvailabilityContext";
+import { getImageUrl } from "../utils/getImageUrl";
+
 
 function AllServices() {
   const navigate = useNavigate();
@@ -39,19 +41,25 @@ function AllServices() {
     }
   };
 
+  const subCategories = useMemo(() => {
+  return categories.flatMap(
+    (cat) => cat.sub_categories || []
+  );
+}, [categories]);
+
+
   /* ---------- FILTERED SERVICES ---------- */
   const filteredServices = useMemo(() => {
     return services
       .filter((service) =>
         service.name.toLowerCase().includes(search.toLowerCase())
       )
-      .filter((service) => {
-        if (activeFilter === "All") return true;
-        return (
-          Number(service.category_id) ===
-          Number(activeFilter)
-        );
-      });
+     .filter((service) => {
+  if (activeFilter === "All") return true;
+  return (
+    Number(service.sub_category_id) === Number(activeFilter)
+  );
+});
   }, [services, search, activeFilter]);
 
   return (
@@ -139,19 +147,19 @@ function AllServices() {
                       All
                     </button>
 
-                    {categories.map((cat) => (
-                      <button
-                        key={cat.id}
-                        onClick={() => setActiveFilter(cat.id)}
-                        className={`px-4 py-2 rounded-full text-sm font-medium ${
-                          Number(activeFilter) === Number(cat.id)
-                            ? "bg-[#00C389] text-white"
-                            : "bg-white border"
-                        }`}
-                      >
-                        {cat.name}
-                      </button>
-                    ))}
+                   {subCategories.map((sub) => (
+  <button
+    key={sub.id}
+    onClick={() => setActiveFilter(sub.id)}
+    className={`px-4 py-2 rounded-full text-sm font-medium ${
+      Number(activeFilter) === Number(sub.id)
+        ? "bg-[#00C389] text-white"
+        : "bg-white border"
+    }`}
+  >
+    {sub.name}
+  </button>
+))}
                   </div>
                 </div>
 
@@ -165,13 +173,24 @@ function AllServices() {
                       }
                       className="bg-white rounded-3xl p-6 border shadow-sm hover:shadow-lg hover:border-[#00C389] transition cursor-pointer"
                     >
-                      <div className="h-12 w-12 rounded-xl bg-[#E6FBF4] flex items-center justify-center">
-                        <img
-                          src={service.icon}
-                          alt={service.name}
-                          className="h-6 w-6"
-                        />
-                      </div>
+                      <div className="relative h-40 w-full rounded-2xl overflow-hidden bg-gray-100">
+  <img
+    src={getImageUrl(
+      service.image || service.icon
+    )}
+    alt={service.name}
+    onError={(e) => {
+      e.currentTarget.src =
+        "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png";
+    }}
+    className="h-full w-full object-cover transition-transform duration-500 hover:scale-105"
+  />
+
+  {/* PRICE BADGE */}
+  <span className="absolute top-3 left-3 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-xs font-semibold text-[#111827] shadow">
+    ₹{service.starting_from}
+  </span>
+</div>
 
                       <h3 className="mt-5 text-lg font-semibold">
                         {service.name}

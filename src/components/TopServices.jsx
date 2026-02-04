@@ -1,10 +1,12 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { ChevronRight } from "lucide-react";
+import { getImageUrl } from "../utils/getImageUrl";
+
 
 function TopServices({ services = [] }) {
   const navigate = useNavigate();
-
+console.log("IMAGE BASE URL =", process.env.REACT_APP_IMAGE_BASE_URL);
   // sirf top 4 services
   const topServices = services.slice(0, 4);
 
@@ -29,39 +31,61 @@ function TopServices({ services = [] }) {
         {/* Cards */}
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {topServices.map((service) => (
-            <div
-              key={service.id}
-              onClick={() => navigate(`/services/${service.id}`)}
-              className="
-                relative bg-white/70 backdrop-blur-lg
-                border border-white/40 rounded-3xl
-                p-6 shadow-md hover:shadow-xl
-                transition cursor-pointer
-              "
-            >
-              <div className="h-12 w-12 rounded-xl bg-[#E6FBF4] flex items-center justify-center">
-                <img
-                  src={service.icon}
-                  alt={service.name}
-                  className="h-6 w-6"
-                />
-              </div>
+           <div
+  key={service.id}
+  onClick={() => navigate(`/services/${service.id}`)}
+  className="
+    group relative bg-white
+    rounded-3xl border
+    shadow-sm hover:shadow-xl
+    hover:border-[#00C389]
+    transition cursor-pointer
+    overflow-hidden
+  "
+>
+  {/* IMAGE */}
+  <div className="relative h-44 w-full bg-gray-100 overflow-hidden">
+    <img
+      src={getImageUrl(service.image)}
+      alt={service.name}
+      onError={(e) => {
+        e.currentTarget.src =
+          "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png";
+      }}
+      className="
+        h-full w-full object-cover
+        transition-transform duration-500
+        group-hover:scale-105
+      "
+    />
 
-              <h3 className="mt-6 text-lg font-semibold text-[#111827]">
-                {service.name}
-              </h3>
+    {/* PRICE BADGE */}
+    <span className="absolute top-3 left-3 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-xs font-semibold text-[#111827] shadow">
+      ₹{service.starting_from}
+    </span>
+  </div>
 
-              <p className="mt-2 text-[#6B7280]">
-                Starting at{" "}
-                <span className="font-bold text-[#111827]">
-                  ₹{service.starting_from}
-                </span>
-              </p>
+  {/* CONTENT */}
+  <div className="p-5">
+    <h3 className="text-lg font-semibold text-[#111827]">
+      {service.name}
+    </h3>
 
-              <div className="absolute bottom-5 right-5 h-9 w-9 rounded-full bg-[#00C389] flex items-center justify-center text-white">
-                <ChevronRight size={18} />
-              </div>
-            </div>
+    <p className="mt-1 text-sm text-[#6B7280]">
+      Professional & verified service
+    </p>
+
+    <div className="mt-4 flex items-center justify-between">
+      <span className="text-sm font-medium text-[#00C389]">
+        Book now
+      </span>
+
+      <div className="h-8 w-8 rounded-full bg-[#00C389] flex items-center justify-center text-white">
+        <ChevronRight size={16} />
+      </div>
+    </div>
+  </div>
+</div>
           ))}
         </div>
 

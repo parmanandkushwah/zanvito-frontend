@@ -1,6 +1,9 @@
 import React, { useRef } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { getImageUrl } from "../utils/getImageUrl";
+
+
 
 function FeaturedServices({ services = [] }) {
   const sliderRef = useRef(null);
@@ -69,13 +72,13 @@ function FeaturedServices({ services = [] }) {
                 {/* Image */}
                 <div className="relative h-40">
                   <img
-                    src={
-                      service.featured_image ||
-                      "https://via.placeholder.com/300x200?text=Service"
-                    }
-                    alt={service.name}
-                    className="w-full h-full object-cover"
-                  />
+  src={
+    getImageUrl(service.featured_image) ||
+    "https://via.placeholder.com/300x200?text=Service"
+  }
+  alt={service.name}
+  className="w-full h-full object-cover"
+/>
 
                   {/* Featured Badge */}
                   <span className="absolute top-3 left-3 bg-[#00C389] text-white text-xs font-semibold px-3 py-1 rounded-full">

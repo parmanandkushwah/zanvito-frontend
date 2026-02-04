@@ -1,6 +1,8 @@
 import React from "react";
 import heroBg from "../assets/hero-bg1.png";
 import AdvertisementSlider from "./AdvertisementSlider";
+// import { getImageUrl } from "../utils/getImageUrl";
+
 
 function HeroSection({ banners = [] }) {
   return (

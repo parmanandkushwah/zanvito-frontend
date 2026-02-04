@@ -10,6 +10,7 @@ import {
   ChevronRight,
   ArrowRight,
 } from "lucide-react";
+import { getImageUrl } from "../utils/getImageUrl";
 
 function TopCategories({ categories = [], services = [] }) {
   const sliderRef = useRef(null);
@@ -21,7 +22,7 @@ function TopCategories({ categories = [], services = [] }) {
   /* ---------- SET DEFAULT CATEGORY AFTER API LOAD ---------- */
   useEffect(() => {
     if (categories.length && !selectedCategoryId) {
-      setSelectedCategoryId(categories[0].id);
+      setSelectedCategoryId(categories[0].id ?? categories[0].category_id);
     }
   }, [categories, selectedCategoryId]);
 
@@ -35,20 +36,38 @@ function TopCategories({ categories = [], services = [] }) {
   };
 
   /* ---------- SERVICES FILTERED BY CATEGORY ---------- */
-  const filteredServices = useMemo(() => {
-    if (!selectedCategoryId) return [];
+  // const filteredServices = useMemo(() => {
+  //   if (!selectedCategoryId) return [];
 
-    return services.filter(
-      (service) =>
-        Number(service.category_id) === Number(selectedCategoryId)
-    );
-  }, [services, selectedCategoryId]);
+  //   return services.filter(
+  //     (service) =>
+  //       Number(service.category_id) === Number(selectedCategoryId)
+  //   );
+  // }, [services, selectedCategoryId]);
+
+  // ---------- SUBCATEGORIES FILTERED BY CATEGORY ----------
+
+  const filteredSubCategories = useMemo(() => {
+  if (!selectedCategoryId) return [];
+
+  const category = categories.find(
+   (cat) =>
+  Number(cat.id ?? cat.category_id) ===
+  Number(selectedCategoryId)
+  );
+
+  return category?.sub_categories || [];
+}, [categories, selectedCategoryId]);
 
   /* ---------- CURRENT CATEGORY ---------- */
   const activeCategory = categories.find(
-    (cat) => Number(cat.id) === Number(selectedCategoryId)
-  );
+  (cat) =>
+    Number(cat.id ?? cat.category_id) ===
+    Number(selectedCategoryId)
+);
 
+
+// const subCategories = activeCategory?.subCategories || [];
   return (
     <section className="py-12 bg-[#F9FAFB]">
       <div className="max-w-7xl mx-auto px-6">
@@ -81,14 +100,18 @@ function TopCategories({ categories = [], services = [] }) {
             ref={sliderRef}
             className="flex gap-6 overflow-x-hidden scroll-smooth"
           >
-            {categories.map((cat) => {
-              const isActive =
-                Number(selectedCategoryId) === Number(cat.id);
+        {categories.map((cat) => {
+  const catId = cat.id ?? cat.category_id;
+  const catName = (cat.name ?? cat.category_name)?.trim();
+  const catIcon = cat.icon ?? cat.category_icon;
+
+  const isActive =
+    Number(selectedCategoryId) === Number(catId);
 
               return (
                 <div
-                  key={cat.id}
-                  onClick={() => setSelectedCategoryId(cat.id)}
+  key={catId}
+  onClick={() => setSelectedCategoryId(catId)}
                   className={`
                     min-w-[150px] h-[135px]
                     flex flex-col items-center justify-center
@@ -111,8 +134,8 @@ function TopCategories({ categories = [], services = [] }) {
                     `}
                   >
                     <img
-                      src={cat.icon}
-                      alt={cat.name}
+                      src={getImageUrl(catIcon)}
+                      alt={catName}
                       className="h-7 w-7"
                     />
                   </div>
@@ -124,7 +147,7 @@ function TopCategories({ categories = [], services = [] }) {
                         : "text-[#111827]"
                     }`}
                   >
-                    {cat.name}
+                    {catName}
                   </p>
                 </div>
               );
@@ -143,65 +166,54 @@ function TopCategories({ categories = [], services = [] }) {
         {/* SERVICES LIST */}
         <div className="bg-white rounded-3xl p-6 shadow-sm max-w-5xl">
           <h3 className="text-lg font-bold text-[#111827] mb-5">
-            {activeCategory?.name} Services
-          </h3>
+  {activeCategory?.name} Sub Categories
+</h3>
 
-          <div className="grid sm:grid-cols-2 gap-4">
-            {filteredServices.map((service) => (
-              <div
-                key={service.id}
-                onClick={() =>
-                  navigate(`/services/${service.id}`)
-                }
-                className="
-                  flex items-center justify-between
-                  px-4 py-3
-                  rounded-xl
-                  border border-[#E5E7EB]
-                  hover:border-[#00C389]
-                  hover:shadow-md
-                  transition
-                  bg-white
-                  cursor-pointer
-                "
-              >
-                {/* LEFT */}
-                <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-full bg-[#00C389]/10 flex items-center justify-center">
-                    <img
-                      src={service.icon}
-                      alt={service.name}
-                      className="h-5 w-5"
-                    />
-                  </div>
+<div className="grid sm:grid-cols-2 gap-4">
+  {filteredSubCategories.map((sub) => (
+    <div
+      key={sub.id}
+      onClick={() => navigate(`/sub-category/${sub.id}`)}
+      className="
+        flex items-center justify-between
+        px-4 py-3
+        rounded-xl
+        border border-[#E5E7EB]
+        hover:border-[#00C389]
+        hover:shadow-md
+        transition
+        bg-white
+        cursor-pointer
+      "
+    >
+      {/* LEFT */}
+      <div className="flex items-center gap-3">
+        <div className="h-10 w-10 rounded-full bg-[#00C389]/10 flex items-center justify-center">
+          <img
+            src={getImageUrl(sub.icon)}
+            alt={sub.name}
+            className="h-5 w-5 object-contain"
+          />
+        </div>
 
-                  <div>
-                    <p className="font-medium text-[#111827] text-sm">
-                      {service.name}
-                    </p>
-                    <p className="text-xs text-[#6B7280]">
-                      Starting from ₹{service.starting_from}
-                    </p>
-                  </div>
-                </div>
+        <p className="font-medium text-[#111827] text-sm">
+          {sub.name}
+        </p>
+      </div>
 
-                {/* RIGHT */}
-                <div className="h-8 w-8 rounded-full bg-[#00C389]/10 flex items-center justify-center">
-                  <ArrowRight
-                    size={16}
-                    className="text-[#00C389]"
-                  />
-                </div>
-              </div>
-            ))}
+      {/* RIGHT */}
+      <div className="h-8 w-8 rounded-full bg-[#00C389]/10 flex items-center justify-center">
+        <ArrowRight size={16} className="text-[#00C389]" />
+      </div>
+    </div>
+  ))}
 
-            {/* EMPTY STATE */}
-            {!filteredServices.length && (
-              <p className="text-sm text-[#6B7280]">
-                No services available for this category
-              </p>
-            )}
-          </div>
+  {!filteredSubCategories.length && (
+    <p className="text-sm text-[#6B7280]">
+      No sub-categories available for this category
+    </p>
+  )}
+</div>
         </div>
 
       </div>

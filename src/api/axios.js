@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "https://quickfix-z904.onrender.com/api",
+  baseURL: "https://quickfix-1-we9c.onrender.com/api",
   headers: {
     "Content-Type": "application/json",
   },

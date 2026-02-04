@@ -12,6 +12,7 @@ import {
   Star,
 } from "lucide-react";
 import { getCustomerBookingDetails } from "../api/bookingApi";
+import { getImageUrl } from "../utils/getImageUrl";
 
 /* 🔥 STATUS CONFIG */
 const statusConfig = {
@@ -44,13 +45,13 @@ const statusConfig = {
 /* 🔹 SKELETON */
 function BookingDetailsSkeleton() {
   return (
-    <div className="space-y-8 animate-pulse">
-      <div className="bg-white rounded-3xl p-6 border flex justify-between">
-        <div className="space-y-2">
-          <div className="h-5 w-48 bg-gray-200 rounded" />
-          <div className="h-4 w-32 bg-gray-200 rounded" />
-        </div>
-        <div className="h-7 w-28 bg-gray-200 rounded-full" />
+    <div className="space-y-6 animate-pulse">
+      <div className="bg-white rounded-3xl p-6 border h-28" />
+      <div className="bg-white rounded-3xl p-6 border h-24" />
+      <div className="grid sm:grid-cols-3 gap-4">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="bg-white rounded-2xl p-5 border h-20" />
+        ))}
       </div>
     </div>
   );
@@ -65,7 +66,6 @@ function BookingDetails() {
   const [review, setReview] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  /* ✅ DEFINE FIRST */
   const fetchBookingDetails = useCallback(async () => {
     try {
       const res = await getCustomerBookingDetails(id);
@@ -77,7 +77,6 @@ function BookingDetails() {
     }
   }, [id]);
 
-  /* ✅ THEN USE */
   useEffect(() => {
     window.scrollTo(0, 0);
     fetchBookingDetails();
@@ -101,7 +100,7 @@ function BookingDetails() {
     return (
       <>
         <Navbar />
-        <div className="pt-40 text-center text-sm text-red-500">
+        <div className="pt-40 text-center text-red-500">
           Booking not found
         </div>
         <Footer />
@@ -125,13 +124,16 @@ function BookingDetails() {
         <div className="max-w-6xl mx-auto px-6 space-y-8">
 
           {/* HEADER */}
-          <div className="bg-white rounded-3xl p-6 border flex justify-between">
+          <div className="bg-white rounded-3xl p-6 border flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold">{service?.name}</h1>
+              <h1 className="text-2xl font-bold text-[#111827]">
+                {service?.name}
+              </h1>
               <p className="text-sm text-gray-500">
                 Booking ID #{booking.id}
               </p>
             </div>
+
             <span
               className={`px-4 py-1 rounded-full text-sm font-semibold ${status.className}`}
             >
@@ -141,13 +143,22 @@ function BookingDetails() {
 
           {/* SERVICE INFO */}
           <div className="bg-white rounded-3xl p-6 border flex items-center gap-4">
-            <img
-              src={service?.icon}
-              alt={service?.name}
-              className="h-14 w-14 rounded-xl object-cover"
-            />
+            <div className="h-16 w-16 rounded-xl overflow-hidden bg-gray-100">
+              <img
+                src={getImageUrl(service?.image)}
+                alt={service?.name}
+                onError={(e) => {
+                  e.currentTarget.src =
+                    "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png";
+                }}
+                className="h-full w-full object-cover"
+              />
+            </div>
+
             <div>
-              <p className="font-semibold">{service?.name}</p>
+              <p className="font-semibold text-[#111827]">
+                {service?.name}
+              </p>
               <p className="text-sm text-gray-500">
                 {booking.booking_type === "instant"
                   ? "Instant Service"
@@ -177,7 +188,9 @@ function BookingDetails() {
 
           {/* PROVIDER */}
           <div className="grid sm:grid-cols-2 gap-6">
-            {provider && <ProfileCard title="Provider" person={provider} />}
+            {provider && (
+              <ProfileCard title="Provider" person={provider} />
+            )}
             {serviceman && (
               <ProfileCard title="Serviceman" person={serviceman} />
             )}
@@ -186,7 +199,7 @@ function BookingDetails() {
           {/* PAYMENT */}
           {payment && (
             <div className="bg-white rounded-3xl p-6 border">
-              <h3 className="font-bold mb-3">Payment Details</h3>
+              <h3 className="font-bold mb-4">Payment Details</h3>
               <Row label="Total Amount" value={payment.total_amount} />
               <Row label="Advance Paid" value={payment.advance_amount} />
               <Row label="Payment Type" value={payment.payment_type} />
@@ -249,7 +262,7 @@ function BookingDetails() {
   );
 }
 
-/* SMALL COMPONENTS */
+/* 🔹 SMALL COMPONENTS */
 
 const InfoCard = ({ icon, label, value }) => (
   <div className="bg-white rounded-2xl p-5 border">
@@ -264,9 +277,13 @@ const InfoCard = ({ icon, label, value }) => (
 const ProfileCard = ({ title, person }) => (
   <div className="bg-white rounded-3xl p-6 border flex gap-4">
     <img
-      src={person.profile_photo}
+      src={getImageUrl(person.profile_photo)}
       alt={person.name}
-      className="h-14 w-14 rounded-full"
+      onError={(e) => {
+        e.currentTarget.src =
+          "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png";
+      }}
+      className="h-14 w-14 rounded-full object-cover"
     />
     <div>
       <p className="text-sm text-gray-500">{title}</p>
@@ -279,7 +296,7 @@ const ProfileCard = ({ title, person }) => (
 );
 
 const Row = ({ label, value }) => (
-  <div className="flex justify-between text-sm">
+  <div className="flex justify-between text-sm mb-2">
     <span className="text-gray-500">{label}</span>
     <span className="font-semibold flex items-center gap-1">
       <IndianRupee size={14} /> {value}
