@@ -68,7 +68,8 @@ function AllServices() {
 
       {/* 🔴 COMING SOON OVERLAY */}
       {!serviceAvailable && (
-        <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/40">
+        <div className="fixed top-1/2 left-1/2 z-50 -translate-x-1/2 -translate-y-1/2">
+
           <div className="bg-white rounded-2xl shadow-2xl p-6 max-w-md text-center">
             <h2 className="text-xl font-bold text-gray-800 mb-2">
               🚧 Coming Soon
@@ -213,10 +214,11 @@ function AllServices() {
               </div>
             </section>
 
-            <Footer />
+            
           </>
         )}
       </div>
+      <Footer />
     </>
   );
 }

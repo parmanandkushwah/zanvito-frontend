@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { LogOut, User } from "lucide-react";
 import { useAvailability } from "../context/AvailabilityContext";
-
+import { getImageUrl } from "../utils/getImageUrl";
 
 import {
   reverseGeocode,
@@ -358,35 +358,44 @@ const ensureLoggedIn = () => {
     </button>
   ) : (
     <div className="relative inline-block">
-      {/* PROFILE ICON */}
-      <button
-        onClick={() => {
-          setOpen((prev) => !prev);
-          setProfileOpen(false);
-        }}
-        className="
-          h-10 w-10 rounded-full
-          flex items-center justify-center
-          text-white font-semibold
-          shadow-md transition hover:scale-105
-        "
-        style={{
-          background:
-            "linear-gradient(180deg, #00C389 0%, #007A57 70%, #003D2B 100%)",
-        }}
-      >
-        {user?.profile_photo ? (
-          <img
-            src={user.profile_photo}
-            alt="profile"
-            className="h-full w-full object-cover rounded-full"
-          />
-        ) : user?.name ? (
-          user.name.charAt(0).toUpperCase()
-        ) : (
-          <User size={18} />
-        )}
-      </button>
+    {/* PROFILE ICON */}
+<button
+  onClick={() => {
+    setOpen((prev) => !prev);
+    setProfileOpen(false);
+  }}
+  className="
+    h-10 w-10 rounded-full
+    flex items-center justify-center
+    text-white font-semibold
+    shadow-md transition hover:scale-105
+    overflow-hidden
+  "
+  style={{
+    background:
+      "linear-gradient(180deg, #00C389 0%, #007A57 70%, #003D2B 100%)",
+  }}
+>
+  {user?.profile_photo ? (
+    <img
+      src={getImageUrl(user.profile_photo)}
+      alt="profile"
+      onError={(e) => {
+        e.currentTarget.src =
+          "https://ui-avatars.com/api/?name=" +
+          encodeURIComponent(user?.name || "User") +
+          "&background=00C389&color=fff";
+      }}
+      className="h-full w-full object-cover rounded-full"
+    />
+  ) : user?.name ? (
+    <span className="text-sm">
+      {user.name.charAt(0).toUpperCase()}
+    </span>
+  ) : (
+    <User size={18} />
+  )}
+</button>
 
       {/* MAIN DROPDOWN */}
       {open && (

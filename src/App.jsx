@@ -10,6 +10,8 @@ import Signup from "./pages/Signup";
 import OtpVerify from "./pages/OtpVerify";
 import MyBookings from "./pages/MyBookings";
 import BookingDetails from "./pages/BookingDetails";
+import Terms from "./pages/Terms";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 
 function App() {
   return (
@@ -25,6 +27,9 @@ function App() {
           <Route path="/categories" element={<AllCategories />} />
           <Route path="/my-bookings" element={<MyBookings />} />
           <Route path="/my-bookings/:id" element={<BookingDetails />} />
+           <Route path="/terms" element={<Terms />} />
+  <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+
         </Routes>
       </BrowserRouter>
     </AvailabilityProvider>

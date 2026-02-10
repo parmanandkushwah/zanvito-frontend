@@ -24,12 +24,8 @@ function Home() {
   const [services, setServices] = useState([]);
   const [featuredServices, setFeaturedServices] = useState([]);
 
-  // ✅ SINGLE SOURCE OF TRUTH
   const { serviceAvailable } = useAvailability();
 
-  /* ===============================
-     FETCH HOME DATA
-  =============================== */
   useEffect(() => {
     fetchHomeData();
   }, []);
@@ -54,15 +50,16 @@ function Home() {
     <>
       <Navbar />
 
-         {/* 🔴 COMING SOON OVERLAY */}
+      {/* 🔴 FIXED CENTER CARD (NO FULLSCREEN LAYER) */}
       {!serviceAvailable && (
-        <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/40">
+        <div className="fixed top-1/2 left-1/2 z-50 -translate-x-1/2 -translate-y-1/2">
           <div className="bg-white rounded-2xl shadow-2xl p-6 max-w-md text-center">
             <h2 className="text-xl font-bold text-gray-800 mb-2">
               🚧 Coming Soon
             </h2>
             <p className="text-gray-600 mb-4">
               Services are not available in your area yet.
+              <br />
               Please change your location.
             </p>
 
@@ -78,7 +75,7 @@ function Home() {
         </div>
       )}
 
-      {/* 🔒 PAGE CONTENT */}
+      {/* 🔒 MAIN CONTENT ONLY */}
       <div
         className={`transition-all duration-300 ${
           !serviceAvailable
@@ -107,8 +104,10 @@ function Home() {
         )}
 
         <Newsletter />
-        <Footer />
       </div>
+
+      {/* ✅ FOOTER – FULLY CLICKABLE */}
+      <Footer />
     </>
   );
 }

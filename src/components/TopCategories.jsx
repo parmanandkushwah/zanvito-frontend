@@ -134,8 +134,10 @@ function TopCategories({ categories = [], services = [] }) {
                     `}
                   >
                     <img
-                      src={getImageUrl(catIcon)}
+                      src={getImageUrl(catIcon) ||
+    "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png"} 
                       alt={catName}
+                      
                       className="h-7 w-7"
                     />
                   </div>
@@ -190,7 +192,8 @@ function TopCategories({ categories = [], services = [] }) {
       <div className="flex items-center gap-3">
         <div className="h-10 w-10 rounded-full bg-[#00C389]/10 flex items-center justify-center">
           <img
-            src={getImageUrl(sub.icon)}
+            src={getImageUrl(sub.icon) ||
+    "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png"}
             alt={sub.name}
             className="h-5 w-5 object-contain"
           />

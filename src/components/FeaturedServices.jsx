@@ -67,6 +67,7 @@ function FeaturedServices({ services = [] }) {
                   shadow-md hover:shadow-xl
                   transition cursor-pointer
                   overflow-hidden
+                  
                 "
               >
                 {/* Image */}
@@ -74,7 +75,7 @@ function FeaturedServices({ services = [] }) {
                   <img
   src={
     getImageUrl(service.image) ||
-    "https://via.placeholder.com/300x200?text=Service"
+    "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png"
   }
   alt={service.name}
   className="w-full h-full object-cover"
