@@ -12,6 +12,7 @@ import MyBookings from "./pages/MyBookings";
 import BookingDetails from "./pages/BookingDetails";
 import Terms from "./pages/Terms";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
+import ContactUs from "./pages/ContactUs";
 
 function App() {
   return (
@@ -29,7 +30,7 @@ function App() {
           <Route path="/my-bookings/:id" element={<BookingDetails />} />
            <Route path="/terms" element={<Terms />} />
   <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-
+<Route path="/contact" element={<ContactUs />} />
         </Routes>
       </BrowserRouter>
     </AvailabilityProvider>
